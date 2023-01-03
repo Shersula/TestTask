@@ -1,0 +1,13 @@
+﻿@using TestTask.Models
+@model Files
+<div class="container">
+	<div class="d-flex flex-column">
+		<div class="">@Model.getName()</div>
+		<div class="d-flex flex-column" style="margin-left: 1em;">
+			@foreach (Files item in Model.getChild())
+			{
+				<div class="">@item.getName()</div>
+			}
+		</div>
+	</div>
+</div>
