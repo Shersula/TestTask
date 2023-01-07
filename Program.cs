@@ -1,3 +1,5 @@
+using TestTask.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddMvc(option => option.EnableEndpointRouting = false);
