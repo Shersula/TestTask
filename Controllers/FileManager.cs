@@ -12,26 +12,31 @@ namespace TestTask.Controllers
             if (Root == null)
             {
                 Root = new Files("Диск C", false);
-                Files RootTwo = new Files("Файл 1", true, 10, Root);
+                new Files("Файл 1", true, 10, Root);
                 new Files("Файл 2", true, 10, Root);
-                new Files("Файл 3", true, 10, Root);
+                new Files("Папка", false, 10, Root);
                 new Files("Файл 4", true, 10, Root);
-
-                new Files("Файл 10", false, 10, RootTwo);
-                new Files("Файл 110", true, 10, RootTwo);
             }
             return View(Root);
         }
+
         [HttpGet]
-        public JsonResult GetDirectory(int code)
+        public JsonResult GetDirectory(int ParentCode)
         {
-            return Json(Root.FindChildByHashCode(code));
+            List<Files> ChildList = Root.FindByHashCode(ParentCode).getChild();
+            if (ChildList.Count <= 0) return Json(null);
+            else return Json(ChildList);
         }
 
         [HttpPost]
         public void AddElement([FromBody] PostJSONResult data)
         {
-            new Files(data.Name, data.isAFile, 10, Root.FindByHashCode(data.ParentCode));
+            new Files(data.Name, data.isAFile, data.Weight, Root.FindByHashCode(data.ParentCode));
+        }
+        [HttpDelete]
+        public void RemoveElement(int ElementCode)
+        {
+            Root.FindByHashCode(ElementCode).Remove();
         }
     }
 }

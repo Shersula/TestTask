@@ -18,52 +18,45 @@ namespace TestTask.Models
         public Files(string name, bool File, int weight=0)
         {
             this.Name = name;
-            this.Weight = weight;
             this.children = new List<Files>();
             this.Hash = this.GetHashCode();
             this.isAFile = File;
+            this.UpdateWeight(weight);
         }
         public Files(string name, bool File, int weight, Files Parent)
         {
             this.Name = name;
-            this.Weight = weight;
             this.parrent = Parent;
-            this.parrent.UpdateWeight(this.Weight);
             this.parrent.children.Add(this);
             this.children = new List<Files>();
             this.Hash = this.GetHashCode();
             this.isAFile = File;
+            this.UpdateWeight(weight);
         }
-        public bool RemoveChild(Files child)
+        public void Remove()
         {
-            return children.Remove(child);
+            if(this.parrent != null) this.parrent.children.Remove(this);
+            this.parrent = null;
+            this.children.Clear();
         }
         public List<Files> getChild()
         {
-            return children;
-        }
-        public List<Files> FindChildByHashCode(int HashCode)
-        {
-            if (this.Hash == HashCode) return this.getChild();
-            foreach (Files child in getChild())
-            {
-                if (child.Hash == HashCode)
-                {
-                    if (child.getChild().Count <= 0) return null;
-                    return child.getChild();
-                }
-                else return child.FindChildByHashCode(HashCode);
-            }
-            return null;
+            return this.children;
         }
 
         public Files FindByHashCode(int HashCode)
         {
             if (this.Hash == HashCode) return this;
-            foreach (Files child in getChild())
+
+            foreach (Files child in this.getChild())
             {
                 if (child.Hash == HashCode) return child;
-                else return child.FindByHashCode(HashCode);
+            }
+
+            foreach (Files child in this.getChild())
+            {
+                Files Finded = child.FindByHashCode(HashCode);
+                if(Finded != null) return Finded;
             }
             return null;
         }

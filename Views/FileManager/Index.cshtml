@@ -25,4 +25,24 @@
     </div>
 </div>
 
+<div class="modal fade" id="AddFile" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="AddFileLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="AddFileLabel">Создание файла</h5>
+            </div>
+            <div class="modal-body">
+                Введите название файла
+                <input type="text" class="form-control" id="FileNameInput">
+                Укажите размер файла
+                <input type="number" placeholder="МБ" min="1" class="form-control" id="FileWeightInput">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-primary" id="CreateFileButton">Создать</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="js/Index.js"></script>
