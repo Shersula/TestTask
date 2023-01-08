@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Diagnostics;
 using TestTask.Models;
 
@@ -9,17 +10,14 @@ namespace TestTask.Controllers
         static Files Root = null;
         public IActionResult Index()
         {
-            if (Root == null)
-            {
-                Root = new Files("Диск C", false);
-                new Files("Файл 1", true, 10, Root);
-                new Files("Файл 2", true, 10, Root);
-                new Files("Папка", false, 10, Root);
-                new Files("Файл 4", true, 10, Root);
-            }
+            if (Root == null) Root = new Files("Проводник", false);
             return View(Root);
         }
-
+        [HttpGet]
+        public JsonResult GetInfo(int ElementCode)
+        {
+            return Json(Root.FindByHashCode(ElementCode));
+        }
         [HttpGet]
         public JsonResult GetDirectory(int ParentCode)
         {

@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace TestTask.Models
 {
@@ -10,10 +11,14 @@ namespace TestTask.Models
         public string Name { private set; get; }
         public int Weight { private set; get; }
         public int Hash { private set; get; }
-        private void UpdateWeight(int weight)
+        private void UpdateWeight()
         {
-            this.Weight += weight;
-            if(this.parrent != null) this.parrent.UpdateWeight(weight);
+            this.Weight = 0;
+            foreach (Files child in this.getChild())
+            {
+                this.Weight += child.Weight;
+            }
+            if (this.parrent != null) this.parrent.UpdateWeight();
         }
         public Files(string name, bool File, int weight=0)
         {
@@ -21,7 +26,7 @@ namespace TestTask.Models
             this.children = new List<Files>();
             this.Hash = this.GetHashCode();
             this.isAFile = File;
-            this.UpdateWeight(weight);
+            this.Weight = weight;
         }
         public Files(string name, bool File, int weight, Files Parent)
         {
@@ -31,12 +36,19 @@ namespace TestTask.Models
             this.children = new List<Files>();
             this.Hash = this.GetHashCode();
             this.isAFile = File;
-            this.UpdateWeight(weight);
+            this.Weight = weight;
+            if (this.parrent != null) this.parrent.UpdateWeight();
         }
         public void Remove()
         {
-            if(this.parrent != null) this.parrent.children.Remove(this);
+            Files Parent = this.parrent;
             this.parrent = null;
+
+            if (Parent != null)
+            {
+                Parent.children.Remove(this);
+                Parent.UpdateWeight();
+            }
             this.children.Clear();
         }
         public List<Files> getChild()

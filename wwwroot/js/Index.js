@@ -1,14 +1,46 @@
-﻿document.getElementById("RootElement").addEventListener("click", TriangleButton);
+﻿addEventListener("load", UpdateInfo(document.querySelector("i[key]").getAttribute("key")));
+document.getElementById("RootElement").addEventListener("click", TriangleButton);
 document.getElementById("CreateFolderButton").addEventListener("click", AddFolder);
 document.getElementById("CreateFileButton").addEventListener("click", AddFile);
+document.getElementById("StartAddFolder").addEventListener("click", AddFolderModal);
+document.getElementById("StartAddFile").addEventListener("click", AddFileModal);
+
 
 function GetDirectory(key, root) {
     fetch(document.location.protocol + "//" + document.location.host + "/FileManager/GetDirectory?ParentCode=" + key, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     }).then(response => response.json()).then(obj => {
-        UpdateChildElemet(root, obj)
+        UpdateChildElement(root, obj);
     });
+}
+
+function UpdateInfo(key, lastkey = null) {
+
+    item = document.querySelector("i[key=\"" + key + "\"]");
+    root = item.parentElement;
+    nextkey = root.parentElement.querySelector("i[key]").getAttribute("key");
+    if (root != null && nextkey != lastkey) {
+        UpdateInfo(nextkey, key);
+        xhr = new XMLHttpRequest();
+        xhr.open('GET', document.location.protocol + "//" + document.location.host + "/FileManager/GetDirectory?ParentCode=" + key, false);
+        xhr.send();
+        if (xhr.status == 200) UpdateChildElement(document.querySelector("i[key=\"" + key + "\"]").parentElement, JSON.parse(xhr.response));
+    }
+    else {
+        fetch(document.location.protocol + "//" + document.location.host + "/FileManager/GetInfo?ElementCode=" + item.getAttribute("key"), {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
+        }).then(response => response.json()).then(obj => {
+
+            childList = [...item.parentElement.children]
+            childList.forEach(items => {
+                if (items.nodeName == "SPAN") {
+                    items.childNodes[0].nodeValue = obj.name + " (" + obj.weight + " МБ)";
+                }
+            });
+        });
+    }
 }
 
 function TriangleButton(event) {
@@ -23,12 +55,31 @@ function ClearChild(root) {
     childList = [...root.children];
     childList.forEach(item => {
         if (item.nodeName == "DIV") item.remove();
-    })
+    });
 }
 
-function UpdateChildElemet(root, childList) {
+function quicksort(array) {
+    if (array.length <= 1) {
+        return array;
+    }
+
+    var pivot = array[0];
+
+    var left = [];
+    var right = [];
+
+    for (var i = 1; i < array.length; i++)
+    {
+        array[i].weight < pivot.weight ? left.push(array[i]) : right.push(array[i]);
+    }
+
+    return quicksort(left).concat(pivot, quicksort(right));
+};
+
+function UpdateChildElement(root, childList) {
     ClearChild(root);
     if (childList != null) {
+        childList = quicksort(childList);
         root.querySelector('i').setAttribute("class", "bi bi-caret-down");
         childList.forEach(item => {
             el = document.createElement('div');
@@ -52,7 +103,9 @@ function UpdateChildElemet(root, childList) {
                 el.appendChild(icon);
             }
 
-            el.appendChild(document.createTextNode(item.name + " (" + item.weight + " МБ)"));
+            text = document.createElement('span');
+            text.appendChild(document.createTextNode(item.name + " (" + item.weight + " МБ)"));
+            el.appendChild(text);
             el.style.marginLeft = "1em";
 
             if (item.isAFile == true) {
@@ -101,7 +154,6 @@ function UpdateChildElemet(root, childList) {
                 btn.appendChild(icon);
                 btn.addEventListener("click", RemoveElement);
             }
-
         })
     }
 }
@@ -113,7 +165,9 @@ function RemoveElement(event) {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' }
     }).then(response => {
-        if (response.ok == true) GetDirectory(root.parentElement.querySelector("i[key]").getAttribute("key"), root.parentElement);
+        if (response.ok == true) {
+            UpdateInfo(root.parentElement.querySelector("i[key]").getAttribute("key"));
+        }
     });
 }
 
@@ -125,7 +179,6 @@ function AddFile(event) {
     if (document.getElementById("ErrMsg") != null) document.getElementById("ErrMsg").remove();
 
     if (document.getElementById("FileNameInput").value.length <= 0) {
-        console.log("+");
         err = document.createElement('p');
         err.appendChild(document.createTextNode("Вы не ввели название файла"));
         err.setAttribute("class", "text-danger");
@@ -156,7 +209,7 @@ function AddFile(event) {
                 document.getElementById("FileNameInput").value = "";
                 document.getElementById("FileWeightInput").value = "";
                 modal.hide();
-                GetDirectory(key, document.querySelector("i[key=\"" + key + "\"]").parentElement);
+                UpdateInfo(key);
             }
         });
     }
@@ -193,7 +246,7 @@ function AddFolder(event) {
                 modal = bootstrap.Modal.getInstance(document.getElementById('AddFolder'));
                 document.getElementById("FolderNameInput").value = "";
                 modal.hide();
-                GetDirectory(key, document.querySelector("i[key=\"" + key + "\"]").parentElement);
+                UpdateInfo(key);
             }
         });
     }

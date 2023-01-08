@@ -3,8 +3,10 @@
 <div class="d-flex flex-column">
 	<div>
 		<i class="bi bi-caret-right" id="RootElement" key="@Model.Hash"></i>
-		@Model.Name @Model.Weight МБ
-	</div>
+        <span>@Model.Name (@Model.Weight МБ)</span>
+        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" id="StartAddFolder" data-bs-target="#AddFolder"><i class="bi bi-folder-plus"></i></button>
+        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" id="StartAddFile" data-bs-target="#AddFile"><i class="bi bi-file-earmark-plus"></i></button>
+    </div>
 </div>
 
 <div class="modal fade" id="AddFolder" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="AddFolderLabel" aria-hidden="true">

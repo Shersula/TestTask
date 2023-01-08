@@ -1,18 +1,27 @@
-using TestTask.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using TestTask;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddMvc(option => option.EnableEndpointRouting = false);
-var app = builder.Build();
-
-app.UseStaticFiles();
-app.UseMvcWithDefaultRoute();
-
-app.UseMvc(routes =>
+namespace WebApplication1
 {
-    routes.MapRoute(
-    name: "default",
-    template: "{controller=FileManager}/{action=Index}");
-});
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            CreateHostBuilder(args).Build().Run();
+        }
 
-app.Run();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
+    }
+}
